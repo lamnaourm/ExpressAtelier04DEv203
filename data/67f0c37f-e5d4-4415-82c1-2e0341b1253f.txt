@@ -1,0 +1,1 @@
+{"nom":"produit 8","description":"Description du produit 8","famille":"Textile","image":"image8.jpg","prix":88.3}

@@ -36,10 +36,31 @@ app.get('/produits/all', (req, res) => {
 
 app.get('/produits/id/:id', (req, res) => {
 
+    const id = req.params.id;
+
+     if(!fs.existsSync(`${directory}/${id}.txt`)){
+        return res.sendStatus(404);
+     }
+
+     const data = fs.readFileSync(`${directory}/${id}.txt`,'utf8');
+     res.json({id:id, ...JSON.parse(data)});
 })
 
 app.get('/produits/famille/:famille', (req, res) => {
+    var prds = []
+    const famille = req.params.famille;
     
+    const files = fs.readdirSync(directory); 
+
+    files.forEach(file => {
+        const data = fs.readFileSync(`${directory}/${file}`,'utf8');
+        const produit = JSON.parse(data); 
+        
+        if(produit.famille === famille)
+            prds.push({id:file.split('.')[0] , ...produit})
+    });
+
+    res.status(202).json(prds);
 })
 
 app.put('/produits/:id', (req, res) => {
