@@ -1,0 +1,15 @@
+POST http://localhost:3000/produit
+content-type: application/json
+
+{
+    "nom":"produit 4",
+    "description":"Description du produit 4",
+    "famille": "Epicerie",
+    "image": "image4.jpg",
+    "prix": 55.3
+}
+
+
+###
+
+GET http://localhost:3000/produit/all
