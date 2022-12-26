@@ -1,76 +1,86 @@
-const express = require('express')
-const { v4: uuid } = require('uuid')
-const fs = require('fs')
+const express = require("express");
+const { v4: uuid } = require("uuid");
+const fs = require("fs");
 
 const app = express();
 const port = 3000;
-const directory = './data'
+const directory = "./data";
 
-app.use(express.json())
+app.use(express.json());
 
+app.post("/produits", (req, res) => {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory);
+  }
 
-app.post('/produits', (req, res) => {
-
-    if(!fs.existsSync(directory)){
-        fs.mkdirSync(directory);
-    }
-
-    const id = uuid();
-    fs.writeFileSync(`${directory}/${id}.txt`,JSON.stringify(req.body));
-    res.sendStatus(201);
+  const id = uuid();
+  fs.writeFileSync(`${directory}/${id}.txt`, JSON.stringify(req.body));
+  res.sendStatus(201);
 });
 
-app.get('/produits/all', (req, res) => {
+app.get("/produits/all", (req, res) => {
+  var prds = [];
 
-    var prds = []
-    
-    const files = fs.readdirSync(directory); 
+  const files = fs.readdirSync(directory);
 
-    files.forEach(file => {
-        const data = fs.readFileSync(`${directory}/${file}`,'utf8');
-        prds.push({id:file.split('.')[0] , ...JSON.parse(data)})
-    });
+  files.forEach((file) => {
+    const data = fs.readFileSync(`${directory}/${file}`, "utf8");
+    prds.push({ id: file.split(".")[0], ...JSON.parse(data) });
+  });
 
-    res.status(202).json(prds);
-})
+  res.status(202).json(prds);
+});
 
-app.get('/produits/id/:id', (req, res) => {
+app.get("/produits/id/:id", (req, res) => {
+  const id = req.params.id;
 
+  if (!fs.existsSync(`${directory}/${id}.txt`)) {
+    return res.sendStatus(404);
+  }
+
+  const data = fs.readFileSync(`${directory}/${id}.txt`, "utf8");
+  res.json({ id: id, ...JSON.parse(data) });
+});
+
+app.get("/produits/famille/:famille", (req, res) => {
+  var prds = [];
+  const famille = req.params.famille;
+
+  const files = fs.readdirSync(directory);
+
+  files.forEach((file) => {
+    const data = fs.readFileSync(`${directory}/${file}`, "utf8");
+    const produit = JSON.parse(data);
+
+    if (produit.famille === famille)
+      prds.push({ id: file.split(".")[0], ...produit });
+  });
+
+  res.status(202).json(prds);
+});
+
+app.put("/produits/:id", (req, res) => {
+  const id = req.params.id;
+
+  if (!fs.existsSync(`${directory}/${id}.txt`)) {
+    return res.sendStatus(404);
+  }
+
+  fs.writeFileSync(`${directory}/${id}.txt`, JSON.stringify(req.body));
+  res.end();
+});
+
+app.delete("/produits/:id", (req, res) => {
     const id = req.params.id;
 
-     if(!fs.existsSync(`${directory}/${id}.txt`)){
-        return res.sendStatus(404);
-     }
+    if (!fs.existsSync(`${directory}/${id}.txt`)) {
+      return res.sendStatus(404);
+    }
 
-     const data = fs.readFileSync(`${directory}/${id}.txt`,'utf8');
-     res.json({id:id, ...JSON.parse(data)});
-})
-
-app.get('/produits/famille/:famille', (req, res) => {
-    var prds = []
-    const famille = req.params.famille;
-    
-    const files = fs.readdirSync(directory); 
-
-    files.forEach(file => {
-        const data = fs.readFileSync(`${directory}/${file}`,'utf8');
-        const produit = JSON.parse(data); 
-        
-        if(produit.famille === famille)
-            prds.push({id:file.split('.')[0] , ...produit})
-    });
-
-    res.status(202).json(prds);
-})
-
-app.put('/produits/:id', (req, res) => {
-    
-})
-
-app.delete('/produits/:id', (req, res) => {
-    
-})
+    fs.unlinkSync(`${directory}/${id}.txt`)
+    res.end();
+});
 
 app.listen(port, () => {
-    console.log('Serveur lance ...');
-})
+  console.log("Serveur lance ...");
+});

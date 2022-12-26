@@ -1,1 +1,1 @@
-{"nom":"produit 8","description":"Description du produit 8","famille":"Textile","image":"image8.jpg","prix":88.3}
+{"nom":"produit 10000","description":"Description du produit 10000","famille":"dede","image":"image1000.jpg","prix":59.3}
