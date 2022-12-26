@@ -9,7 +9,7 @@ const directory = './data'
 app.use(express.json())
 
 
-app.post('/produit', (req, res) => {
+app.post('/produits', (req, res) => {
 
     if(!fs.existsSync(directory)){
         fs.mkdirSync(directory);
@@ -20,7 +20,7 @@ app.post('/produit', (req, res) => {
     res.sendStatus(201);
 });
 
-app.get('/produit/all', (req, res) => {
+app.get('/produits/all', (req, res) => {
 
     var prds = []
     
@@ -28,10 +28,26 @@ app.get('/produit/all', (req, res) => {
 
     files.forEach(file => {
         const data = fs.readFileSync(`${directory}/${file}`,'utf8');
-        prds.push(JSON.parse(data))
+        prds.push({id:file.split('.')[0] , ...JSON.parse(data)})
     });
 
     res.status(202).json(prds);
+})
+
+app.get('/produits/id/:id', (req, res) => {
+
+})
+
+app.get('/produits/famille/:famille', (req, res) => {
+    
+})
+
+app.put('/produits/:id', (req, res) => {
+    
+})
+
+app.delete('/produits/:id', (req, res) => {
+    
 })
 
 app.listen(port, () => {
